@@ -75,26 +75,49 @@ app.get('/test3', function (req, res) {
   var statuses_new = [];
   var last_id      = '';
 
-  async.until(
-    function () { return (statuses_old.length == statuses_new.length || count == threshold); },
-    function (callback) {
-      count++;
+  async.parallel({
+    statuses: function (flow_callback) {
+      async.until(
+        function () { return (statuses_old.length == statuses_new.length || count == threshold); },
+        function (callback) {
+          count++;
 
-      get_user_timeline(last_id)(function (nothing, statuses_data) {
-        var statuses_data = JSON.parse(statuses_data);
+          get_user_timeline(last_id)(function (nothing, statuses_data) {
+            var statuses_data = JSON.parse(statuses_data);
 
-        statuses_old = statuses_new;
-        statuses_new = statuses_new.concat(statuses_data)
-        last_id      = statuses_data[statuses_data.length - 1].id
+            statuses_old = statuses_new;
+            statuses_new = statuses_new.concat(statuses_data)
+            last_id      = statuses_data[statuses_data.length - 1].id
 
-        callback();
-      });
+            console.log(statuses_new.length);
+
+            callback();
+          });
+        },
+        function (err) {
+          flow_callback(null, statuses_new);
+        }
+      );
     },
-    function (err) {
-      console.log(statuses_new.length)
-      res.send('OK')
+    limit: function (flow_callback) {
+      oAuth.get('https://api.twitter.com/1.1/application/rate_limit_status.json?',
+        accessToken, accessTokenSecret, function (limit_error, limit_data) {
+          if (limit_error) {
+            console.log(limit_error);
+          }
+
+          flow_callback(null, limit_data);
+        });
     }
-  );
+  }, function (err, results){
+    var statuses = results.statuses;
+
+    res.render('test', {
+      statuses_data: statuses,
+      limit_statuses_data: JSON.parse(results.limit).resources.statuses,
+      last_id: statuses[statuses.length - 1].id
+    });
+  });
 });
 
 app.get('/user/:max_id?', function (req, res) {

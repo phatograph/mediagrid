@@ -20,17 +20,14 @@ block content
           - if (url.expanded_url.match(/twitpic.com/))
             - var splitted = url.expanded_url.split('/')
             li
-              p= status.id
               p
                 img(src='//twitpic.com/show/iphone/' + splitted[splitted.length - 1])
           - else if (url.expanded_url.match(/yfrog.com/))
             li
-              p= status.id
               p
                 img(src='#{url.expanded_url}:tw1')
           - else if (url.expanded_url.match(/instagr.am/))
             li
-              p= status.id
               p
                 img(src='#{url.expanded_url}media/')
           //- - else if (url.expanded_url.match(/youtube.com/))
