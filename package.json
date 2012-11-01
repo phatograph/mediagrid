@@ -1,0 +1,18 @@
+{
+  "name": "mediagrid",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node app"
+  },
+  "dependencies": {
+    "express": "3.0.0",
+    "jade": "*",
+    "oauth": "*",
+    "stylus": "*"
+  },
+  "engines": {
+    "node": "0.8.x",
+    "npm":  "1.1.x"
+  }
+}

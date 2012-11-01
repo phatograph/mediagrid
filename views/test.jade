@@ -1,0 +1,20 @@
+extends layout
+
+block content
+  h2 Limits
+  p
+    strong remaining
+    |  #{limit_statuses_data['/statuses/user_timeline/:id'].remaining} / #{limit_statuses_data['/statuses/user_timeline/:id'].limit}
+  p
+    strong reset at
+    |  #{new Date(limit_statuses_data['/statuses/user_timeline/:id'].reset * 1000)}
+
+  h2 Statuses
+  each status in statuses_data
+    - if(status.entities.urls.length)
+      each url in status.entities.urls
+        - var hostname = url.expanded_url.split('//')[1].split('/')[0]
+        - if(hostname == 'twitpic.com')
+          - var splitted = url.expanded_url.split('/')
+          p
+            img(src='//twitpic.com/show/iphone/' + splitted[splitted.length - 1])
