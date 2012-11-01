@@ -61,11 +61,42 @@ var get_user_timeline = function (max_id, callback) {
 
 app.get('/', routes.index);
 app.get('/users', user.list);
+
 app.get('/test2', function (req, res) {
   get_user_timeline(function (nothing, statuses_data) {
     res.send(JSON.parse(statuses_data));
   });
 });
+
+app.get('/test3', function (req, res) {
+  var count        = 0;
+  var threshold    = 15;
+  var statuses_old = ['dummy'];
+  var statuses_new = [];
+  var last_id      = '';
+
+  async.until(
+    function () { return (statuses_old.length == statuses_new.length || count == threshold); },
+    function (callback) {
+      count++;
+
+      get_user_timeline(last_id)(function (nothing, statuses_data) {
+        var statuses_data = JSON.parse(statuses_data);
+
+        statuses_old = statuses_new;
+        statuses_new = statuses_new.concat(statuses_data)
+        last_id      = statuses_data[statuses_data.length - 1].id
+
+        callback();
+      });
+    },
+    function (err) {
+      console.log(statuses_new.length)
+      res.send('OK')
+    }
+  );
+});
+
 app.get('/user/:max_id?', function (req, res) {
   async.parallel({
     statuses: get_user_timeline(req.params.max_id),
