@@ -36,9 +36,11 @@ var oAuth = new OAuth("http://twitter.com/oauth/request_token",
 var accessToken = '47032387-JVPDHcu1QrWUhNdExVL4rLf7cRvsxAfzIgwAugM';
 var accessTokenSecret = 'sgEmsqb7YxLTMujSv3wvvOcalyyhahuEQeHvBuuu8';
 
-var get_user_timeline = function (max_id, callback) {
+var get_user_timeline = function (username, max_id, callback) {
   return function (callback) {
-    var q = 'https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=phatograph&count=200&include_rts=false';
+    console.log('Getting information of: ' + username)
+
+    var q = 'https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=' + username + '&count=200&include_rts=false';
 
     if(max_id) {
       q += '&max_id=' + max_id
@@ -54,7 +56,7 @@ var get_user_timeline = function (max_id, callback) {
   }
 };
 
-app.get('/', routes.index);
+// app.get('/', routes.index);
 app.get('/users', user.list);
 
 app.get('/test2', function (req, res) {
@@ -67,7 +69,7 @@ app.get('/test4', function (req, res) {
   res.render('test4');
 });
 
-app.get('/test5', function (req, res) {
+app.get('/', function (req, res) {
   res.render('test5');
 });
 
@@ -180,26 +182,26 @@ io.sockets.on('connection', function (socket) {
     io.sockets.emit('news3', 'a');
   });
 
-  socket.on('data1', function (room) {
+  socket.on('data1', function (options) {
     var count          = 0;
-    var threshold      = 15;
+    var threshold      = 3;
     var statuses_count = 1; // make it not 0 at first place
     var last_id        = '';
 
-    socket.join(room); // private room for each user
+    socket.join(options.room); // private room for each user
 
     async.until(
       function () { return (statuses_count == 0 || count == threshold); },
       function (callback) {
         count++;
 
-        get_user_timeline(last_id)(function (nothing, statuses_data) {
+        get_user_timeline(options.username, last_id)(function (nothing, statuses_data) {
           var statuses_data = JSON.parse(statuses_data);
 
           statuses_count = statuses_data.length;
           last_id        = statuses_data[statuses_data.length - 1].id
 
-          io.sockets.in(room).emit('data1_res', statuses_data);
+          io.sockets.in(options.room).emit('data1_res', statuses_data);
 
           callback();
         });

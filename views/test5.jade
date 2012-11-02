@@ -1,6 +1,10 @@
 extends layout
 
 block content
+  p
+    form#search
+      input#name(type='text')
+      input(type='submit', value='go')
   h1 Images
   ul#images
 
@@ -9,7 +13,16 @@ block content
     var socket = io.connect();
     var now = +(new Date());
 
-    socket.emit('data1', now);
+    $('#search').submit(function (e) {
+      e.preventDefault();
+
+      if ($('#name').val()) {
+        socket.emit('data1', {
+          room: now,
+          username: $('#name').val()
+        });
+      }
+    });
 
     socket.on('data1_res', function (data) {
       var target = $('#images');
