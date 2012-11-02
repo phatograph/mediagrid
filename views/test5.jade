@@ -64,21 +64,22 @@ block content
       var html;
 
       $.each(data, function (i, status) {
+        var current_date = new Date(status.created_at);
 
         if(status.entities.urls.length) {
           $.each(status.entities.urls, function (ii, url) {
 
             if (url.expanded_url.match(/twitpic.com/)) {
               var splitted = url.expanded_url.split('/');
-              str += '<li class="span3"><a title="' + status.text + '" rel="lightbox" href="//twitpic.com/show/iphone/' + splitted[splitted.length - 1] + '" class="thumbnail"><img src="//twitpic.com/show/iphone/' + splitted[splitted.length - 1] + '" /><div class="caption"><p>' + status.text + '</p></div></a></li>';
+              str += '<li class="span3"><a title="' + status.text + '" rel="lightbox" href="//twitpic.com/show/iphone/' + splitted[splitted.length - 1] + '" class="thumbnail"><img src="//twitpic.com/show/iphone/' + splitted[splitted.length - 1] + '" /><div class="caption"><p>' + status.text + '</p><p>' + current_date.toLocaleDateString() + '</p></div></a></li>';
             }
 
             else if (url.expanded_url.match(/yfrog.com/)) {
-              str += '<li class="span3"><a title="' + status.text + '" rel="lightbox" href="' + url.expanded_url + ':tw1" class="thumbnail"><img src="' + url.expanded_url + ':tw1" /><div class="caption"><p>' + status.text + '</p></div></a></li>';
+              str += '<li class="span3"><a title="' + status.text + '" rel="lightbox" href="' + url.expanded_url + ':tw1" class="thumbnail"><img src="' + url.expanded_url + ':tw1" /><div class="caption"><p>' + status.text + '</p><p>' + current_date.toLocaleDateString() + '</p></div></a></li>';
             }
 
             else if (url.expanded_url.match(/instagr.am/)) {
-              str += '<li class="span3"><a title="' + status.text + '" rel="lightbox" href="' + url.expanded_url + 'media/" class="thumbnail"><img src="' + url.expanded_url + 'media/" /><div class="caption"><p>' + status.text + '</p></div></a></li>';
+              str += '<li class="span3"><a title="' + status.text + '" rel="lightbox" href="' + url.expanded_url + 'media/" class="thumbnail"><img src="' + url.expanded_url + 'media/" /><div class="caption"><p>' + status.text + '</p><p>' + current_date.toLocaleDateString() + '</p></div></a></li>';
             }
 
           });
@@ -86,7 +87,7 @@ block content
 
         else if(status.entities.media) {
           $.each(status.entities.media, function (ii, media) {
-            str += '<li class="span3"><a title="' + status.text + '" rel="lightbox" href="' + media.media_url + '" class="thumbnail"><img src="' + media.media_url + '" /><div class="caption"><p>' + status.text + '</p></div></a></li>';
+            str += '<li class="span3"><a title="' + status.text + '" rel="lightbox" href="' + media.media_url + '" class="thumbnail"><img src="' + media.media_url + '" /><div class="caption"><p>' + status.text + '</p><p>' + current_date.toLocaleDateString() + '</p></div></a></li>';
           });
         }
 

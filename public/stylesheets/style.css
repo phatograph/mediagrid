@@ -20,7 +20,7 @@ ul#images li .thumbnail img {
   max-height: 300px;
 }
 ul#images li .thumbnail .caption {
-  max-height: 55px;
+  max-height: 66px;
   overflow: hidden;
   font-size: 11px;
   line-height: 14px;
