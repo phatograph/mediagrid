@@ -184,7 +184,7 @@ io.sockets.on('connection', function (socket) {
 
   socket.on('data1', function (options) {
     var count          = 0;
-    var threshold      = 15;
+    var threshold      = 50;
     var statuses_count = 1; // make it not 0 at first place
     var last_id        = '';
 

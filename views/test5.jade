@@ -7,7 +7,7 @@ block content
     input.search-query#name(type='text', style='margin-right: 10px')
     input.btn#submit(type='submit', value='search')
   ul.thumbnails#images
-  .row(style='padding-bottom: 30px; display: none')#progress_bar
+  .row(style='padding: 20px 0 30px; display: none')#progress_bar
     .span4.offset4
       .progress.progress-striped.active
         .bar
@@ -24,7 +24,7 @@ block content
       if ($('#name').val() && !submitted) {
         submitted = true;
 
-        $('#submit').prop('disabled', true);
+        $('#search input').prop('disabled', true);
 
         $('#progress_bar')
           .slideDown()
