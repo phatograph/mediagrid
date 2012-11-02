@@ -7,7 +7,7 @@ block content
     |  #{limit_statuses_data['/statuses/user_timeline/:id'].remaining} / #{limit_statuses_data['/statuses/user_timeline/:id'].limit}
   p
     strong reset at
-    |  #{new Date(limit_statuses_data['/statuses/user_timeline/:id'].reset * 1000)}
+    |  #{((~~limit_statuses_data['/statuses/user_timeline/:id'].reset))}
   p
     strong last id
     |  #{last_id}
@@ -40,7 +40,7 @@ block content
           li
             p
               img(src='#{media.media_url}')
-  p
-    a(href='/user/#{statuses_data[0].id}') prev
-    &nbsp;
-    a(href='/user/#{last_id}') next
+  //- p
+  //-   a(href='/user/#{statuses_data[0].id}') prev
+  //-   &nbsp;
+  //-   a(href='/user/#{last_id}') next

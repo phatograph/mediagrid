@@ -38,7 +38,7 @@ var accessTokenSecret = 'sgEmsqb7YxLTMujSv3wvvOcalyyhahuEQeHvBuuu8';
 
 var get_user_timeline = function (username, max_id, callback) {
   return function (callback) {
-    console.log('Getting information of: ' + username)
+    console.log('Getting information of: ' + username + ', max id: ' + max_id);
 
     var q = 'https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=' + username + '&count=200&include_rts=false';
 
@@ -48,10 +48,15 @@ var get_user_timeline = function (username, max_id, callback) {
 
     oAuth.get(q, accessToken, accessTokenSecret, function (statuses_error, statuses_data) {
       if (statuses_error) {
+        console.log('###################################');
+        console.log('ERROR: get_user_timeline ');
         console.log(statuses_error);
+        console.log('###################################');
+        callback(null, statuses_error);
       }
-
-      callback(null, statuses_data);
+      else {
+        callback(null, JSON.parse(statuses_data));
+      }
     });
   }
 };
@@ -139,13 +144,24 @@ app.get('/user/:max_id?', function (req, res) {
         });
     }
   }, function (err, results){
-    var statuses = JSON.parse(results.statuses);
+    var statuses = results.statuses;
 
-    res.render('test', {
-      statuses_data: statuses,
-      limit_statuses_data: JSON.parse(results.limit).resources.statuses,
-      last_id: statuses[statuses.length - 1].id
-    });
+    console.log(JSON.parse(results.limit).resources);
+
+    if (statuses.statusCode) {
+      res.render('test', {
+        statuses_data: [],
+        limit_statuses_data: JSON.parse(results.limit).resources.statuses,
+        last_id: ''
+      });
+    }
+    else {
+      res.render('test', {
+        statuses_data: statuses,
+        limit_statuses_data: JSON.parse(results.limit).resources.statuses,
+        last_id: statuses[statuses.length - 1].id
+      });
+    }
   });
 });
 
@@ -184,9 +200,10 @@ io.sockets.on('connection', function (socket) {
 
   socket.on('data1', function (options) {
     var count          = 0;
-    var threshold      = 50;
-    var statuses_count = 1; // make it not 0 at first place
+    var threshold      = 20;
+    var statuses_count = 2; // make it more than 1 at first place
     var last_id        = '';
+    var tweet_count    = 0;
 
     socket.join(options.room); // private room for each user
 
@@ -194,27 +211,46 @@ io.sockets.on('connection', function (socket) {
       accessToken, accessTokenSecret, function (user_err, user_data) {
 
         if (user_err) {
+          console.log('###################################');
+          console.log('ERROR: api.twitter.com/1.1/users/show.json ');
+          console.log(user_err);
+          console.log('###################################');
           io.sockets.in(options.room).emit('user_error', JSON.parse(user_err.data).errors[0].message);
         }
         else {
           async.until(
-            function () { return (statuses_count == 0 || count == threshold); },
+            function () { return (statuses_count <= 1 || count == threshold); },
             function (callback) {
               count++;
 
               get_user_timeline(options.username, last_id)(function (nothing, statuses_data) {
-                var statuses_data = JSON.parse(statuses_data);
+                if (statuses_data.statusCode) {
+                  io.sockets.in(options.room).emit('user_error', JSON.parse(statuses_data.data).errors[0].message);
+                  statuses_count = 0;
+                }
+                else {
+                  statuses_count = statuses_data.length;
+                  tweet_count += statuses_count;
 
-                statuses_count = statuses_data.length;
-                last_id        = statuses_data[statuses_data.length - 1].id
+                  if(statuses_data.length > 0) {
+                    last_id = statuses_data[statuses_data.length - 1].id
+                  }
+                  else {
+                    last_id = '';
+                  }
 
-                io.sockets.in(options.room).emit('processing', Math.round(count / threshold * 100));
-                io.sockets.in(options.room).emit('data1_res', statuses_data);
+                  io.sockets.in(options.room).emit('processing', {
+                    tweet_count: tweet_count,
+                    percentage: Math.round(count / threshold * 100)
+                  });
+                  io.sockets.in(options.room).emit('data1_res', statuses_data);
+                }
 
                 callback();
               });
             },
             function (err) {
+              console.log('Finish: ' + options.username);
               io.sockets.in(options.room).emit('finished');
             }
           );

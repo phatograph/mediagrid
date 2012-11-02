@@ -11,89 +11,112 @@ block content
     .span4.offset4
       .progress.progress-striped.active
         .bar
+      p(style='text-align: center; font-size: 11px; color: #FFF;')
 
   script(src="/socket.io/socket.io.js")
   script
-    var socket    = io.connect();
-    var now       = +(new Date());
-    var submitted = false;
+    $(function (){
+      var socket    = io.connect();
+      var now       = +(new Date());
+      var submitted = false;
 
-    $('#search').submit(function (e) {
-      e.preventDefault();
+      Piecon.setOptions({fallback: 'force'});
 
-      if ($('#name').val() && !submitted) {
-        submitted = true;
+      $('#name').focus();
 
-        $('#search input').prop('disabled', true);
+      $('#search').submit(function (e) {
+        e.preventDefault();
 
-        $('#progress_bar')
-          .slideDown()
-          .find('.bar')
-            .removeClass('bar-danger')
-            .css({ width: '1%' })
-            .text('');
+        if ($('#name').val() && !submitted) {
+          submitted = true;
 
-        socket.emit('data1', {
-          room: now,
-          username: $('#name').val()
-        });
-      }
-    });
+          $('#search input').prop('disabled', true);
 
-    socket.on('user_error', function (data) {
-      //- $('#status').text(data);
-      $('#progress_bar .bar')
-        .addClass('bar-danger')
-        .css({ width: '100%' })
-        .text(data);
-    });
+          $('#progress_bar')
+            .slideDown()
+            .find('.bar')
+              .removeClass('bar-danger')
+              .css({ width: '1%' })
+              .text('');
 
-    socket.on('processing', function (data) {
-      //- $('#status').text(data);
-      $('#progress_bar .bar').css({ width: data + '%' });
-    });
-
-    socket.on('finished', function () {
-      //- $('#status').slideUp();
-      $('#progress_bar').delay(2000).slideUp(800);
-    });
-
-    socket.on('data1_res', function (data) {
-      var target = $('#images');
-      var str = '';
-      var html;
-
-      $.each(data, function (i, status) {
-        var current_date = new Date(status.created_at);
-
-        if(status.entities.urls.length) {
-          $.each(status.entities.urls, function (ii, url) {
-
-            if (url.expanded_url.match(/twitpic.com/)) {
-              var splitted = url.expanded_url.split('/');
-              str += '<li class="span3"><a title="' + status.text + '" rel="lightbox" href="//twitpic.com/show/iphone/' + splitted[splitted.length - 1] + '" class="thumbnail"><img src="//twitpic.com/show/iphone/' + splitted[splitted.length - 1] + '" /><div class="caption"><p>' + status.text + '</p><p>' + current_date.toLocaleDateString() + '</p></div></a></li>';
-            }
-
-            else if (url.expanded_url.match(/yfrog.com/)) {
-              str += '<li class="span3"><a title="' + status.text + '" rel="lightbox" href="' + url.expanded_url + ':tw1" class="thumbnail"><img src="' + url.expanded_url + ':tw1" /><div class="caption"><p>' + status.text + '</p><p>' + current_date.toLocaleDateString() + '</p></div></a></li>';
-            }
-
-            else if (url.expanded_url.match(/instagr.am/)) {
-              str += '<li class="span3"><a title="' + status.text + '" rel="lightbox" href="' + url.expanded_url + 'media/" class="thumbnail"><img src="' + url.expanded_url + 'media/" /><div class="caption"><p>' + status.text + '</p><p>' + current_date.toLocaleDateString() + '</p></div></a></li>';
-            }
-
+          socket.emit('data1', {
+            room: now,
+            username: $('#name').val()
           });
         }
-
-        else if(status.entities.media) {
-          $.each(status.entities.media, function (ii, media) {
-            str += '<li class="span3"><a title="' + status.text + '" rel="lightbox" href="' + media.media_url + '" class="thumbnail"><img src="' + media.media_url + '" /><div class="caption"><p>' + status.text + '</p><p>' + current_date.toLocaleDateString() + '</p></div></a></li>';
-          });
-        }
-
       });
 
-      html = $(str);
-      target.append(html);
-      html.hide().stop().fadeIn();
+      socket.on('user_error', function (data) {
+        //- $('#status').text(data);
+        $('#progress_bar .bar')
+          .addClass('bar-danger')
+          .css({ width: '100%' })
+          .text(data)
+          .parent()
+            .removeClass('active');
+      });
+
+      socket.on('processing', function (data) {
+        //- $('#status').text(data);
+
+        Piecon.setProgress(data.percentage);
+
+        $('#progress_bar .bar')
+          .css({ width: data.percentage + '%' })
+          .parent().siblings('p')
+            .text(data.tweet_count + ' tweets processed so far.');
+      });
+
+      socket.on('finished', function () {
+        //- $('#status').slideUp();
+        //- $('#progress_bar').delay(2000).slideUp(800);
+
+        Piecon.reset();
+
+        $('#progress_bar .bar')
+          .css({ width: '100%' })
+          .text('Done!')
+          .parent()
+            .removeClass('active');
+      });
+
+      socket.on('data1_res', function (data) {
+        var target = $('#images');
+        var str = '';
+        var html;
+
+        $.each(data, function (i, status) {
+          var current_date = new Date(status.created_at);
+
+          if(status.entities.urls.length) {
+            $.each(status.entities.urls, function (ii, url) {
+
+              if (url.expanded_url.match(/twitpic.com/)) {
+                var splitted = url.expanded_url.split('/');
+                str += '<li class="span3"><a title="' + status.text + '" rel="lightbox" href="//twitpic.com/show/iphone/' + splitted[splitted.length - 1] + '" class="thumbnail"><img src="//twitpic.com/show/iphone/' + splitted[splitted.length - 1] + '" /><div class="caption"><p>' + status.text + '</p><p>' + current_date.toLocaleDateString() + '</p></div></a></li>';
+              }
+
+              else if (url.expanded_url.match(/yfrog.com/)) {
+                str += '<li class="span3"><a title="' + status.text + '" rel="lightbox" href="' + url.expanded_url + ':tw1" class="thumbnail"><img src="' + url.expanded_url + ':tw1" /><div class="caption"><p>' + status.text + '</p><p>' + current_date.toLocaleDateString() + '</p></div></a></li>';
+              }
+
+              else if (url.expanded_url.match(/instagr.am/)) {
+                str += '<li class="span3"><a title="' + status.text + '" rel="lightbox" href="' + url.expanded_url + 'media/" class="thumbnail"><img src="' + url.expanded_url + 'media/" /><div class="caption"><p>' + status.text + '</p><p>' + current_date.toLocaleDateString() + '</p></div></a></li>';
+              }
+
+            });
+          }
+
+          else if(status.entities.media) {
+            $.each(status.entities.media, function (ii, media) {
+              str += '<li class="span3"><a title="' + status.text + '" rel="lightbox" href="' + media.media_url + '" class="thumbnail"><img src="' + media.media_url + '" /><div class="caption"><p>' + status.text + '</p><p>' + current_date.toLocaleDateString() + '</p></div></a></li>';
+            });
+          }
+
+        });
+
+        html = $(str);
+        target.append(html);
+        html.hide().stop().fadeIn();
+      });
     });

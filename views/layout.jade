@@ -3,18 +3,20 @@ html
   head
     meta(charset='utf-8')
     meta(http-equiv='X-UA-Compatible', content='IE=Edge,chrome=1')
-    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
     title Twit Media Grid
     link(rel='stylesheet', href='/stylesheets/style.css')
+    link(href='/images/favicon.ico', rel='shortcut icon')
     script(src='/javascripts/jquery-1.8.2.min.js')
     script(src='/javascripts/bootstrap.min.js')
     script(src='/javascripts/lightbox.js')
+    script(src='/javascripts/piecon.js')
   body
     .container
       block content
       footer(style='color: #fff; text-align: center;')
         p(style='font-size: 11px; line-height: 14px; margin-bottom: 40px')
-          | Twit Media Grid can search up to ~10000 of most recent tweets of selected user<br />
+          | Twit Media Grid can search up to ~4000 of most recent tweets of selected user<br />
           | and display their media. Current supported sources are twitter, twitpic, yfrog and instagram.<br />
           | <br />
           | Any issue ? Contact&nbsp;
