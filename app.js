@@ -1,8 +1,3 @@
-
-/**
- * Module dependencies.
- */
-
 var express = require('express')
   , routes = require('./routes')
   , user = require('./routes/user')
@@ -63,9 +58,17 @@ app.get('/', routes.index);
 app.get('/users', user.list);
 
 app.get('/test2', function (req, res) {
-  get_user_timeline(function (nothing, statuses_data) {
+  get_user_timeline()(function (nothing, statuses_data) {
     res.send(JSON.parse(statuses_data));
   });
+});
+
+app.get('/test4', function (req, res) {
+  res.render('test4');
+});
+
+app.get('/test5', function (req, res) {
+  res.render('test5');
 });
 
 app.get('/test3', function (req, res) {
@@ -144,6 +147,66 @@ app.get('/user/:max_id?', function (req, res) {
   });
 });
 
-http.createServer(app).listen(app.get('port'), function(){
+// http.createServer(app).listen(app.get('port'), function(){
+//   console.log("Express server listening on port " + app.get('port'));
+// });
+
+var server = http.createServer(app);
+var io = require('socket.io').listen(server);
+
+server.listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
+});
+
+io.configure(function () {
+  io.set('log level', 2);                    // reduce logging
+});
+io.configure('production', function(){
+  io.enable('browser client minification');  // send minified client
+  io.enable('browser client etag');          // apply etag caching logic based on version number
+  io.enable('browser client gzip');          // gzip the file
+  io.set('transports', ['xhr-polling']);     // https://github.com/LearnBoost/Socket.IO/wiki/Configuring-Socket.IO
+  io.set('polling duration', 10);            // https://devcenter.heroku.com/articles/using-socket-io-with-node-js-on-heroku
+});
+
+io.sockets.on('connection', function (socket) {
+  //socket.emit('news', 'a');
+  socket.on('news0', function (data) {
+    console.log('new0');
+    io.sockets.emit('news1', 'a');
+  });
+  socket.on('news2', function (data, fn) {
+    console.log('news2');
+    io.sockets.emit('news3', 'a');
+  });
+
+  socket.on('data1', function (room) {
+    var count          = 0;
+    var threshold      = 15;
+    var statuses_count = 1; // make it not 0 at first place
+    var last_id        = '';
+
+    socket.join(room); // private room for each user
+
+    async.until(
+      function () { return (statuses_count == 0 || count == threshold); },
+      function (callback) {
+        count++;
+
+        get_user_timeline(last_id)(function (nothing, statuses_data) {
+          var statuses_data = JSON.parse(statuses_data);
+
+          statuses_count = statuses_data.length;
+          last_id        = statuses_data[statuses_data.length - 1].id
+
+          io.sockets.in(room).emit('data1_res', statuses_data);
+
+          callback();
+        });
+      },
+      function (err) {
+        // flow_callback(null, statuses_new);
+      }
+    );
+  });
 });

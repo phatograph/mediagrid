@@ -1,0 +1,51 @@
+extends layout
+
+block content
+  h1 Images
+  ul#images
+
+  script(src="/socket.io/socket.io.js")
+  script
+    var socket = io.connect();
+    var now = +(new Date());
+
+    socket.emit('data1', now);
+
+    socket.on('data1_res', function (data) {
+      var target = $('#images');
+      var str = '';
+      var html;
+
+      $.each(data, function (i, status) {
+
+        if(status.entities.urls.length) {
+          $.each(status.entities.urls, function (ii, url) {
+
+            if (url.expanded_url.match(/twitpic.com/)) {
+              var splitted = url.expanded_url.split('/');
+              str += '<li><img src="//twitpic.com/show/iphone/' + splitted[splitted.length - 1] + '" /></li>';
+            }
+
+            else if (url.expanded_url.match(/yfrog.com/)) {
+              str += '<li><img src="' + url.expanded_url + ':tw1" /></li>';
+            }
+
+            else if (url.expanded_url.match(/instagr.am/)) {
+              str += '<li><img src="' + url.expanded_url + 'media/" /></li>';
+            }
+
+          });
+        }
+
+        else if(status.entities.media) {
+          $.each(status.entities.media, function (ii, media) {
+            str += '<li><img src="' + media.media_url + '" /></li>';
+          });
+        }
+
+      });
+
+      html = $(str);
+      target.append(html);
+      html.hide().stop().fadeIn();
+    });

@@ -10,6 +10,7 @@
     "jade": "*",
     "oauth": "*",
     "stylus": "*",
+    "socket.io": "*",
     "async": "*"
   },
   "engines": {
