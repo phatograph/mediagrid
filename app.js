@@ -75,7 +75,7 @@ app.get('/', function (req, res) {
 
 app.get('/test3', function (req, res) {
   var count        = 0;
-  var threshold    = 15;
+  var threshold    = 30;
   var statuses_old = ['dummy'];
   var statuses_new = [];
   var last_id      = '';
@@ -184,7 +184,7 @@ io.sockets.on('connection', function (socket) {
 
   socket.on('data1', function (options) {
     var count          = 0;
-    var threshold      = 3;
+    var threshold      = 15;
     var statuses_count = 1; // make it not 0 at first place
     var last_id        = '';
 
@@ -194,7 +194,7 @@ io.sockets.on('connection', function (socket) {
       accessToken, accessTokenSecret, function (user_err, user_data) {
 
         if (user_err) {
-          io.sockets.in(options.room).emit('processing', JSON.parse(user_err.data).errors[0].message);
+          io.sockets.in(options.room).emit('user_error', JSON.parse(user_err.data).errors[0].message);
         }
         else {
           async.until(
@@ -208,7 +208,7 @@ io.sockets.on('connection', function (socket) {
                 statuses_count = statuses_data.length;
                 last_id        = statuses_data[statuses_data.length - 1].id
 
-                io.sockets.in(options.room).emit('processing', 'loading .. (' + count + '/' + threshold + ')');
+                io.sockets.in(options.room).emit('processing', Math.round(count / threshold * 100));
                 io.sockets.in(options.room).emit('data1_res', statuses_data);
 
                 callback();

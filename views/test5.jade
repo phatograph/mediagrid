@@ -1,25 +1,37 @@
 extends layout
 
 block content
-  p
-    form#search
-      input#name(type='text')
-      input(type='submit', value='go')
-  p#status
-  h1 Images
-  ul#images
+  h1(style='text-align: center; padding-bottom: 30px; color: #fff') Twit Media Grid
+  form.form-search#search(style='text-align: center; padding-bottom: 30px')
+    input.search-query#name(type='text', style='margin-right: 10px')
+    input.btn#submit(type='submit', value='search')
+  .row(style='padding-bottom: 30px; display: none')#progress_bar
+    .span4.offset4
+      .progress.progress-striped.active
+        .bar
+  ul.thumbnails#images
 
   script(src="/socket.io/socket.io.js")
   script
-    var socket = io.connect();
-    var now = +(new Date());
+    var socket    = io.connect();
+    var now       = +(new Date());
+    var submitted = false;
 
     $('#search').submit(function (e) {
       e.preventDefault();
 
-      $('#status').text('loading ..').hide().slideDown();
+      if ($('#name').val() && !submitted) {
+        submitted = true;
 
-      if ($('#name').val()) {
+        $('#submit').prop('disabled', true);
+
+        $('#progress_bar')
+          .slideDown()
+          .find('.bar')
+            .removeClass('bar-danger')
+            .css({ width: '5%' })
+            .text('');
+
         socket.emit('data1', {
           room: now,
           username: $('#name').val()
@@ -27,12 +39,22 @@ block content
       }
     });
 
+    socket.on('user_error', function (data) {
+      //- $('#status').text(data);
+      $('#progress_bar .bar')
+        .addClass('bar-danger')
+        .css({ width: '100%' })
+        .text(data);
+    });
+
     socket.on('processing', function (data) {
-      $('#status').text(data);
+      //- $('#status').text(data);
+      $('#progress_bar .bar').css({ width: data + '%' });
     });
 
     socket.on('finished', function () {
-      $('#status').slideUp();
+      //- $('#status').slideUp();
+      $('#progress_bar').delay(2000).slideUp(800);
     });
 
     socket.on('data1_res', function (data) {
@@ -47,15 +69,15 @@ block content
 
             if (url.expanded_url.match(/twitpic.com/)) {
               var splitted = url.expanded_url.split('/');
-              str += '<li><img src="//twitpic.com/show/iphone/' + splitted[splitted.length - 1] + '" /></li>';
+              str += '<li class="span3"><div class="thumbnail"><img src="//twitpic.com/show/iphone/' + splitted[splitted.length - 1] + '" /></div></li>';
             }
 
             else if (url.expanded_url.match(/yfrog.com/)) {
-              str += '<li><img src="' + url.expanded_url + ':tw1" /></li>';
+              str += '<li class="span3"><div class="thumbnail"><img src="' + url.expanded_url + ':tw1" /></div></li>';
             }
 
             else if (url.expanded_url.match(/instagr.am/)) {
-              str += '<li><img src="' + url.expanded_url + 'media/" /></li>';
+              str += '<li class="span3"><div class="thumbnail"><img src="' + url.expanded_url + 'media/" /></div></li>';
             }
 
           });
@@ -63,7 +85,7 @@ block content
 
         else if(status.entities.media) {
           $.each(status.entities.media, function (ii, media) {
-            str += '<li><img src="' + media.media_url + '" /></li>';
+            str += '<li class="span3"><div class="thumbnail"><img src="' + media.media_url + '" /></div></li>';
           });
         }
 

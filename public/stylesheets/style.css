@@ -1,27 +1,16 @@
+@import 'bootstrap.css';
+@import 'bootstrap-responsive.css';
 body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
-}
-a {
-  color: #00b7ff;
-}
-.img-list img {
-  max-width: 640px;
-  max-height: 640px;
-}
-ul#images {
-  overflow: hidden;
+  padding: 40px 0;
+  background-image: url("/images/bg.png");
+  background-repeat: repeat;
 }
 ul#images li {
-  float: left;
-  margin: 0 10px 10px 0;
-  list-style-type: none;
-  font-size: 10px;
-  width: 100px;
-  height: 100px;
-  text-align: center;
+  height: 300px;
 }
-ul#images li img {
-  max-width: 100px;
-  max-height: 100px;
+ul#images li .thumbnail {
+  background-color: #fff;
+}
+ul#images li .thumbnail img {
+  max-height: 300px;
 }
