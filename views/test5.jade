@@ -71,13 +71,15 @@ block content
         //- $('#status').slideUp();
         //- $('#progress_bar').delay(2000).slideUp(800);
 
-        Piecon.reset();
+        setTimeout(function () {
+          Piecon.reset();
 
-        $('#progress_bar .bar')
-          .css({ width: '100%' })
-          .text('Done!')
-          .parent()
-            .removeClass('active');
+          $('#progress_bar .bar')
+            .css({ width: '100%' })
+            .text('Done!')
+            .parent()
+              .removeClass('active');
+        }, 1000);
       });
 
       socket.on('data1_res', function (data) {
