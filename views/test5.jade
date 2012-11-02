@@ -6,11 +6,11 @@ block content
   form.form-search#search(style='text-align: center; padding-bottom: 30px')
     input.search-query#name(type='text', style='margin-right: 10px')
     input.btn#submit(type='submit', value='search')
+  ul.thumbnails#images
   .row(style='padding-bottom: 30px; display: none')#progress_bar
     .span4.offset4
       .progress.progress-striped.active
         .bar
-  ul.thumbnails#images
 
   script(src="/socket.io/socket.io.js")
   script
