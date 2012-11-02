@@ -190,25 +190,36 @@ io.sockets.on('connection', function (socket) {
 
     socket.join(options.room); // private room for each user
 
-    async.until(
-      function () { return (statuses_count == 0 || count == threshold); },
-      function (callback) {
-        count++;
+    oAuth.get('https://api.twitter.com/1.1/users/show.json?include_entities=false&screen_name=' + options.username,
+      accessToken, accessTokenSecret, function (user_err, user_data) {
 
-        get_user_timeline(options.username, last_id)(function (nothing, statuses_data) {
-          var statuses_data = JSON.parse(statuses_data);
+        if (user_err) {
+          io.sockets.in(options.room).emit('processing', JSON.parse(user_err.data).errors[0].message);
+        }
+        else {
+          async.until(
+            function () { return (statuses_count == 0 || count == threshold); },
+            function (callback) {
+              count++;
 
-          statuses_count = statuses_data.length;
-          last_id        = statuses_data[statuses_data.length - 1].id
+              get_user_timeline(options.username, last_id)(function (nothing, statuses_data) {
+                var statuses_data = JSON.parse(statuses_data);
 
-          io.sockets.in(options.room).emit('data1_res', statuses_data);
+                statuses_count = statuses_data.length;
+                last_id        = statuses_data[statuses_data.length - 1].id
 
-          callback();
-        });
-      },
-      function (err) {
-        // flow_callback(null, statuses_new);
-      }
-    );
+                io.sockets.in(options.room).emit('processing', 'loading .. (' + count + '/' + threshold + ')');
+                io.sockets.in(options.room).emit('data1_res', statuses_data);
+
+                callback();
+              });
+            },
+            function (err) {
+              io.sockets.in(options.room).emit('finished');
+            }
+          );
+        }
+
+      });
   });
 });

@@ -5,6 +5,7 @@ block content
     form#search
       input#name(type='text')
       input(type='submit', value='go')
+  p#status
   h1 Images
   ul#images
 
@@ -16,12 +17,22 @@ block content
     $('#search').submit(function (e) {
       e.preventDefault();
 
+      $('#status').text('loading ..').hide().slideDown();
+
       if ($('#name').val()) {
         socket.emit('data1', {
           room: now,
           username: $('#name').val()
         });
       }
+    });
+
+    socket.on('processing', function (data) {
+      $('#status').text(data);
+    });
+
+    socket.on('finished', function () {
+      $('#status').slideUp();
     });
 
     socket.on('data1_res', function (data) {
