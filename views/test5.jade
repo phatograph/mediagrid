@@ -2,6 +2,7 @@ extends layout
 
 block content
   h1(style='text-align: center; padding-bottom: 30px; color: #fff') Twit Media Grid
+    small &nbsp;&nbsp;beta
   form.form-search#search(style='text-align: center; padding-bottom: 30px')
     input.search-query#name(type='text', style='margin-right: 10px')
     input.btn#submit(type='submit', value='search')
@@ -29,7 +30,7 @@ block content
           .slideDown()
           .find('.bar')
             .removeClass('bar-danger')
-            .css({ width: '5%' })
+            .css({ width: '1%' })
             .text('');
 
         socket.emit('data1', {
@@ -69,15 +70,15 @@ block content
 
             if (url.expanded_url.match(/twitpic.com/)) {
               var splitted = url.expanded_url.split('/');
-              str += '<li class="span3"><div class="thumbnail"><img src="//twitpic.com/show/iphone/' + splitted[splitted.length - 1] + '" /></div></li>';
+              str += '<li class="span3"><a title="' + status.text + '" rel="lightbox" href="//twitpic.com/show/iphone/' + splitted[splitted.length - 1] + '" class="thumbnail"><img src="//twitpic.com/show/iphone/' + splitted[splitted.length - 1] + '" /><div class="caption"><p>' + status.text + '</p></div></a></li>';
             }
 
             else if (url.expanded_url.match(/yfrog.com/)) {
-              str += '<li class="span3"><div class="thumbnail"><img src="' + url.expanded_url + ':tw1" /></div></li>';
+              str += '<li class="span3"><a title="' + status.text + '" rel="lightbox" href="' + url.expanded_url + ':tw1" class="thumbnail"><img src="' + url.expanded_url + ':tw1" /><div class="caption"><p>' + status.text + '</p></div></a></li>';
             }
 
             else if (url.expanded_url.match(/instagr.am/)) {
-              str += '<li class="span3"><div class="thumbnail"><img src="' + url.expanded_url + 'media/" /></div></li>';
+              str += '<li class="span3"><a title="' + status.text + '" rel="lightbox" href="' + url.expanded_url + 'media/" class="thumbnail"><img src="' + url.expanded_url + 'media/" /><div class="caption"><p>' + status.text + '</p></div></a></li>';
             }
 
           });
@@ -85,7 +86,7 @@ block content
 
         else if(status.entities.media) {
           $.each(status.entities.media, function (ii, media) {
-            str += '<li class="span3"><div class="thumbnail"><img src="' + media.media_url + '" /></div></li>';
+            str += '<li class="span3"><a title="' + status.text + '" rel="lightbox" href="' + media.media_url + '" class="thumbnail"><img src="' + media.media_url + '" /><div class="caption"><p>' + status.text + '</p></div></a></li>';
           });
         }
 
