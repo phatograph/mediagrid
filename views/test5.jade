@@ -103,7 +103,7 @@ block content
               }
 
               else if (url.expanded_url.match(/instagr.am/)) {
-                str += '<li class="span3"><a title="' + status.text + '" rel="lightbox" href="' + url.expanded_url + 'media/" class="thumbnail"><img src="' + url.expanded_url + 'media/" /><div class="caption"><p>' + status.text + '</p><p>' + current_date.toLocaleDateString() + '</p></div></a></li>';
+                str += '<li class="span3"><a title="' + status.text + '" rel="lightbox" href="' + url.expanded_url + 'media/?size=l" class="thumbnail"><img src="' + url.expanded_url + 'media/" /><div class="caption"><p>' + status.text + '</p><p>' + current_date.toLocaleDateString() + '</p></div></a></li>';
               }
 
             });
