@@ -1,6 +1,4 @@
 var express = require('express')
-  , routes = require('./routes')
-  , user = require('./routes/user')
   , http = require('http')
   , path = require('path')
   , async = require('async');
@@ -61,113 +59,11 @@ var get_user_timeline = function (username, max_id, callback) {
   }
 };
 
-// app.get('/', routes.index);
-app.get('/users', user.list);
-
-app.get('/test2', function (req, res) {
-  get_user_timeline()(function (nothing, statuses_data) {
-    res.send(JSON.parse(statuses_data));
+app.get('/:user_id?', function (req, res) {
+  res.render('index', {
+    user_id: req.params.user_id
   });
 });
-
-app.get('/test4', function (req, res) {
-  res.render('test4');
-});
-
-app.get('/', function (req, res) {
-  res.render('test5');
-});
-
-app.get('/test3', function (req, res) {
-  var count        = 0;
-  var threshold    = 30;
-  var statuses_old = ['dummy'];
-  var statuses_new = [];
-  var last_id      = '';
-
-  async.parallel({
-    statuses: function (flow_callback) {
-      async.until(
-        function () { return (statuses_old.length == statuses_new.length || count == threshold); },
-        function (callback) {
-          count++;
-
-          get_user_timeline(last_id)(function (nothing, statuses_data) {
-            var statuses_data = JSON.parse(statuses_data);
-
-            statuses_old = statuses_new;
-            statuses_new = statuses_new.concat(statuses_data)
-            last_id      = statuses_data[statuses_data.length - 1].id
-
-            console.log(statuses_new.length);
-
-            callback();
-          });
-        },
-        function (err) {
-          flow_callback(null, statuses_new);
-        }
-      );
-    },
-    limit: function (flow_callback) {
-      oAuth.get('https://api.twitter.com/1.1/application/rate_limit_status.json?',
-        accessToken, accessTokenSecret, function (limit_error, limit_data) {
-          if (limit_error) {
-            console.log(limit_error);
-          }
-
-          flow_callback(null, limit_data);
-        });
-    }
-  }, function (err, results){
-    var statuses = results.statuses;
-
-    res.render('test', {
-      statuses_data: statuses,
-      limit_statuses_data: JSON.parse(results.limit).resources.statuses,
-      last_id: statuses[statuses.length - 1].id
-    });
-  });
-});
-
-app.get('/user/:max_id?', function (req, res) {
-  async.parallel({
-    statuses: get_user_timeline(req.params.max_id),
-    limit: function (callback) {
-      oAuth.get('https://api.twitter.com/1.1/application/rate_limit_status.json?',
-        accessToken, accessTokenSecret, function (limit_error, limit_data) {
-          if (limit_error) {
-            console.log(limit_error);
-          }
-
-          callback(null, limit_data);
-        });
-    }
-  }, function (err, results){
-    var statuses = results.statuses;
-
-    console.log(JSON.parse(results.limit).resources);
-
-    if (statuses.statusCode) {
-      res.render('test', {
-        statuses_data: [],
-        limit_statuses_data: JSON.parse(results.limit).resources.statuses,
-        last_id: ''
-      });
-    }
-    else {
-      res.render('test', {
-        statuses_data: statuses,
-        limit_statuses_data: JSON.parse(results.limit).resources.statuses,
-        last_id: statuses[statuses.length - 1].id
-      });
-    }
-  });
-});
-
-// http.createServer(app).listen(app.get('port'), function(){
-//   console.log("Express server listening on port " + app.get('port'));
-// });
 
 var server = http.createServer(app);
 var io = require('socket.io').listen(server);
@@ -189,16 +85,6 @@ io.configure('production', function(){
 });
 
 io.sockets.on('connection', function (socket) {
-  //socket.emit('news', 'a');
-  socket.on('news0', function (data) {
-    console.log('new0');
-    io.sockets.emit('news1', 'a');
-  });
-  socket.on('news2', function (data, fn) {
-    console.log('news2');
-    io.sockets.emit('news3', 'a');
-  });
-
   socket.on('data1', function (options) {
     var count          = 0;
     var threshold      = 20;
