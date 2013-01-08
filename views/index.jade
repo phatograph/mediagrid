@@ -9,7 +9,9 @@ block content
     .span4.offset4
       .progress.progress-striped.active
         .bar
-      p(style='text-align: center; font-size: 11px; color: #FFF;')
+      .processed-info
+        p#processed Loading ..
+        p Please wait approx 10 second for each result chunk.
 
   script(src="/socket.io/socket.io.js")
   script
@@ -64,10 +66,8 @@ block content
 
         Piecon.setProgress(data.percentage);
 
-        $('#progress_bar .bar')
-          .css({ width: data.percentage + '%' })
-          .parent().siblings('p')
-            .text(data.tweet_count + ' tweets processed so far. Please wait approx 10 second for each result chunk.');
+        $('#progress_bar .bar').css({ width: data.percentage + '%' })
+        $('#processed').text(data.tweet_count + ' tweets processed so far.');
       });
 
       socket.on('finished', function () {

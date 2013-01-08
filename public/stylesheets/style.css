@@ -27,6 +27,13 @@ ul#images li .thumbnail .caption {
   padding: 15px 0 5px;
   text-align: center;
 }
+.processed-info p {
+  text-align: center;
+  font-size: 11px;
+  line-height: 14px;
+  color: #fff;
+  margin-bottom: 5px;
+}
 a:hover,
 a:active {
   text-decoration: none;
