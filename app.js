@@ -80,8 +80,8 @@ io.configure('production', function(){
   io.enable('browser client etag');          // apply etag caching logic based on version number
   io.enable('browser client gzip');          // gzip the file
   io.set('log level', 1);                    // reduce logging
-  io.set('transports', ['xhr-polling']);     // https://github.com/LearnBoost/Socket.IO/wiki/Configuring-Socket.IO
-  io.set('polling duration', 10);            // https://devcenter.heroku.com/articles/using-socket-io-with-node-js-on-heroku
+  // io.set('transports', ['xhr-polling']);     // https://github.com/LearnBoost/Socket.IO/wiki/Configuring-Socket.IO
+  // io.set('polling duration', 10);            // https://devcenter.heroku.com/articles/using-socket-io-with-node-js-on-heroku
 });
 
 io.sockets.on('connection', function (socket) {
