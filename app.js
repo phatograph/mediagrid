@@ -115,7 +115,12 @@ io.sockets.on('connection', function (socket) {
 
               get_user_timeline(options.username, last_id)(function (nothing, statuses_data) {
                 if (statuses_data.statusCode) {
-                  user_err_msg = JSON.parse(user_err.data).errors ? JSON.parse(user_err.data).errors[0].message : JSON.parse(user_err.data).error;
+                  console.log('###################################');
+                  console.log('ERROR: api.twitter.com/1.1/users/show.json ');
+                  console.log(statuses_data);
+                  console.log('###################################');
+
+                  user_err_msg = JSON.parse(statuses_data.data).errors ? JSON.parse(statuses_data.data).errors[0].message : JSON.parse(statuses_data.data).error;
                   io.sockets.in(options.room).emit('user_error', user_err_msg);
                   statuses_count = 0;
                 }
