@@ -102,7 +102,9 @@ io.sockets.on('connection', function (socket) {
           console.log('ERROR: api.twitter.com/1.1/users/show.json ');
           console.log(user_err);
           console.log('###################################');
-          io.sockets.in(options.room).emit('user_error', JSON.parse(user_err.data).errors[0].message);
+
+          var user_err_msg = JSON.parse(user_err.data).errors ? JSON.parse(user_err.data).errors[0].message : JSON.parse(user_err.data).error;
+          io.sockets.in(options.room).emit('user_error', user_err_msg);
         }
         else {
           async.until(
