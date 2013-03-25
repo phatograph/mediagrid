@@ -22,23 +22,29 @@ html
         var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
       })();
   body
+    a(href="https://github.com/phatograph/mediagrid")
+      img(style="position: absolute; top: 0; right: 0; border: 0;", src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png", alt="Fork me on GitHub")
     .container
       h1(style='text-align: center; padding-bottom: 30px; color: #fff') Twit Media Grid
-        small &nbsp;&nbsp;beta
       div(style='color: #fff; text-align: center;')
         p(style='font-size: 13px; line-height: 14px; margin-bottom: 50px')
           | <strong>Update!</strong><br />
           | <br />
-          | Now you can use direct link to display user's media,<br />
-          | e.g. twitmediagrid.phatograph.com/phatograph.
+          | Twitter has brought their <a href="https://twitter.com/phatograph/media/grid">media grid</a> back!<br />
+          | So I decided to open-source this project.
+          | <a href="https://github.com/phatograph/mediagrid">Fork me</a>
+          | if you like!
       block content
       footer(style='color: #fff; text-align: center;')
-        p(style='font-size: 11px; line-height: 14px; margin-bottom: 40px')
+        p(style='font-size: 11px; line-height: 14px; padding: 0 40px 40px')
           | Twit Media Grid can search up to ~3200 of most recent tweets of selected user<br />
           | and display their media. Current supported sources are twitter, twitpic, yfrog and instagram.<br />
           | <br />
+          | You can use direct link to display user's media,<br />
+          | e.g. twitmediagrid.phatograph.com/phatograph.<br />
+          | <br />
           | Any issue ? Contact&nbsp;
-          a(href='https://twitter.com/TwitMediaGrid') @TwitMediaGrid
+          a(href='https://twitter.com/phatograph') @phatograph
         p
           | twitmediagrid &copy; 2012.&nbsp;
           a(href='http://phatograph.com') phatograph.com
