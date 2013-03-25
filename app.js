@@ -80,8 +80,8 @@ io.configure('production', function(){
   io.enable('browser client etag');          // apply etag caching logic based on version number
   io.enable('browser client gzip');          // gzip the file
   io.set('log level', 1);                    // reduce logging
-  io.set('transports', ['xhr-polling']);     // https://github.com/LearnBoost/Socket.IO/wiki/Configuring-Socket.IO
-  io.set('polling duration', 10);            // https://devcenter.heroku.com/articles/using-socket-io-with-node-js-on-heroku
+  // io.set('transports', ['xhr-polling']);     // https://github.com/LearnBoost/Socket.IO/wiki/Configuring-Socket.IO
+  // io.set('polling duration', 10);            // https://devcenter.heroku.com/articles/using-socket-io-with-node-js-on-heroku
 });
 
 io.sockets.on('connection', function (socket) {
@@ -91,6 +91,7 @@ io.sockets.on('connection', function (socket) {
     var statuses_count = 2; // make it more than 1 at first place
     var last_id        = '';
     var tweet_count    = 0;
+    var user_err_msg;
 
     socket.join(options.room); // private room for each user
 
@@ -102,7 +103,9 @@ io.sockets.on('connection', function (socket) {
           console.log('ERROR: api.twitter.com/1.1/users/show.json ');
           console.log(user_err);
           console.log('###################################');
-          io.sockets.in(options.room).emit('user_error', JSON.parse(user_err.data).errors[0].message);
+
+          user_err_msg = JSON.parse(user_err.data).errors ? JSON.parse(user_err.data).errors[0].message : JSON.parse(user_err.data).error;
+          io.sockets.in(options.room).emit('user_error', user_err_msg);
         }
         else {
           async.until(
@@ -112,7 +115,13 @@ io.sockets.on('connection', function (socket) {
 
               get_user_timeline(options.username, last_id)(function (nothing, statuses_data) {
                 if (statuses_data.statusCode) {
-                  io.sockets.in(options.room).emit('user_error', JSON.parse(statuses_data.data).errors[0].message);
+                  console.log('###################################');
+                  console.log('ERROR: api.twitter.com/1.1/users/show.json ');
+                  console.log(statuses_data);
+                  console.log('###################################');
+
+                  user_err_msg = JSON.parse(statuses_data.data).errors ? JSON.parse(statuses_data.data).errors[0].message : JSON.parse(statuses_data.data).error;
+                  io.sockets.in(options.room).emit('user_error', user_err_msg);
                   statuses_count = 0;
                 }
                 else {
