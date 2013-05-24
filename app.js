@@ -25,14 +25,14 @@ app.configure('development', function(){
 var OAuth = require('oauth').OAuth;
 var oAuth = new OAuth("http://twitter.com/oauth/request_token",
                "http://twitter.com/oauth/access_token",
-               'tUvYUVOMk8EyLD64DmlYw',
-               'dwcUJ2q4k47QoNGPlnCknzYAnoEKcoSxha3kFx588',
+               process.env.CONSUMER_KEY,
+               process.env.CONSUMER_SECRET,
                "1.0A",
                null,
                "HMAC-SHA1");
 
-var accessToken = '47032387-JVPDHcu1QrWUhNdExVL4rLf7cRvsxAfzIgwAugM';
-var accessTokenSecret = 'sgEmsqb7YxLTMujSv3wvvOcalyyhahuEQeHvBuuu8';
+var accessToken = process.env.ACCESS_TOKEN;
+var accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
 
 var get_user_timeline = function (username, max_id, callback) {
   return function (callback) {
